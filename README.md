@@ -10,4 +10,4 @@ Windows 10
 Visual Studio 2015    
 
 # Thanks
-特别感谢 [ikkyu-wen](https://github.com/ikkyu-wen) 及他的 [Multi-client-communication](https://github.com/ikkyu-wen/Multi-client-communication)
+Many thanks to [ikkyu-wen](https://github.com/ikkyu-wen) and the [Multi-client-communication](https://github.com/ikkyu-wen/Multi-client-communication)
