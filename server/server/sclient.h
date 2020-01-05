@@ -1,13 +1,14 @@
-#pragma once
+ï»¿#pragma once
 #include <winsock2.h>
 #include <iostream>
 
 using namespace std;
 
-#define TIMEFOR_THREAD_CLIENT 500	//Ïß³ÌË¯ÃßÊ±¼ä
+#define TIMEFOR_THREAD_CLIENT 500	//çº¿ç¨‹ç¡çœ æ—¶é—´
 
-#define	MAX_NUM_CLIENT 10	//½ÓÊÜµÄ¿Í»§¶ËÁ¬½Ó×î¶àÊıÁ¿
-#define	MAX_NUM_BUF 64	//»º³åÇøµÄ×î´ó³¤¶È
+#define	MAX_NUM_CLIENT 10	//æ¥å—çš„å®¢æˆ·ç«¯è¿æ¥æœ€å¤šæ•°é‡
+#define	MAX_NUM_BUF 64	//ç¼“å†²åŒºçš„æœ€å¤§é•¿åº¦
+#define PING "ping"	 //å‘é€æ ‡å¿—
 
 class CClient
 {
@@ -16,12 +17,16 @@ public:
 	virtual ~CClient();
 
 public:
-	BOOL StartRuning(void);	//´´½¨·¢ËÍºÍ½ÓÊÕÊı¾İÏß³Ì
-	BOOL IsConning(void)	//ÊÇ·ñÁ¬½Ó´æÔÚ
+	sockaddr_in GetAddr(void)	//è¿”å›addr
+	{
+		return m_addr;
+	}
+	BOOL StartRuning(void);	//åˆ›å»ºå‘é€å’Œæ¥æ”¶æ•°æ®çº¿ç¨‹
+	BOOL IsConning(void)	//æ˜¯å¦è¿æ¥å­˜åœ¨
 	{					
 		return m_bConning;
 	}
-	void DisConning(void)	//¶Ï¿ªÓë¿Í»§¶ËµÄÁ¬½Ó
+	void DisConning(void)	//æ–­å¼€ä¸å®¢æˆ·ç«¯çš„è¿æ¥
 	{					
 		m_bConning = FALSE;
 	}
@@ -32,18 +37,18 @@ public:
 	}
 
 public:
-	static DWORD __stdcall RecvDataThread(void* pParam);	//½ÓÊÕ¿Í»§¶ËÊı¾İ
-	static DWORD __stdcall SendDataThread(void* pParam);	//Ïò¿Í»§¶Ë·¢ËÍÊı¾İ
+	static DWORD __stdcall RecvDataThread(void* pParam);	//æ¥æ”¶å®¢æˆ·ç«¯æ•°æ®
+	static DWORD __stdcall SendDataThread(void* pParam);	//å‘å®¢æˆ·ç«¯å‘é€æ•°æ®
 
 private:
 	CClient();
 private:
-	SOCKET m_socket;	//Ì×½Ó×Ö
-	sockaddr_in m_addr;	//µØÖ·
-	HANDLE m_hEvent;	//ÊÂ¼ş¶ÔÏó
-	HANDLE m_hThreadSend;	//·¢ËÍÊı¾İÏß³Ì¾ä±ú
-	HANDLE m_hThreadRecv;	//½ÓÊÕÊı¾İÏß³Ì¾ä±ú
-	CRITICAL_SECTION m_cs;	//ÁÙ½çÇø¶ÔÏó
-	BOOL m_bConning;	//¿Í»§¶ËÁ¬½Ó×´Ì¬
-	BOOL m_bSend;	 //Êı¾İ·¢ËÍ×´Ì¬
+	SOCKET m_socket;	//å¥—æ¥å­—
+	sockaddr_in m_addr;	//åœ°å€
+	HANDLE m_hEvent;	//äº‹ä»¶å¯¹è±¡
+	HANDLE m_hThreadSend;	//å‘é€æ•°æ®çº¿ç¨‹å¥æŸ„
+	HANDLE m_hThreadRecv;	//æ¥æ”¶æ•°æ®çº¿ç¨‹å¥æŸ„
+	CRITICAL_SECTION m_cs;	//ä¸´ç•ŒåŒºå¯¹è±¡
+	BOOL m_bConning;	//å®¢æˆ·ç«¯è¿æ¥çŠ¶æ€
+	BOOL m_bSend;	 //æ•°æ®å‘é€çŠ¶æ€
 };

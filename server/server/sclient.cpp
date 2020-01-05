@@ -1,12 +1,12 @@
-#include <process.h>
+ï»¿#include <process.h>
 #include <stdio.h>
 #include "sclient.h"
 #include "server.h"
 
-//¹¹Ôìº¯Êý
+//æž„é€ å‡½æ•°
 CClient::CClient(const SOCKET sClient, const sockaddr_in &addrClient)
 {
-	//³õÊ¼»¯±äÁ¿
+	//åˆå§‹åŒ–å˜é‡
 	m_hThreadRecv = NULL;
 	m_hThreadSend = NULL;
 	m_socket = sClient;
@@ -14,27 +14,27 @@ CClient::CClient(const SOCKET sClient, const sockaddr_in &addrClient)
 	m_bConning = FALSE;
 	m_bSend = FALSE;
 
-	//´´½¨ÊÂ¼þ
-	m_hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);//ÊÖ¶¯ÉèÖÃÐÅºÅ×´Ì¬£¬³õÊ¼»¯ÎªÎÞÐÅºÅ×´Ì¬
+	//åˆ›å»ºäº‹ä»¶
+	m_hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);//æ‰‹åŠ¨è®¾ç½®ä¿¡å·çŠ¶æ€ï¼Œåˆå§‹åŒ–ä¸ºæ— ä¿¡å·çŠ¶æ€
 										 
-	InitializeCriticalSection(&m_cs);//³õÊ¼»¯ÁÙ½çÇø
+	InitializeCriticalSection(&m_cs);//åˆå§‹åŒ–ä¸´ç•ŒåŒº
 }
 
-//Îö¹¹º¯Êý
+//æžæž„å‡½æ•°
 CClient::~CClient()
 {
-	closesocket(m_socket);			//¹Ø±ÕÌ×½Ó×Ö
-	m_socket = INVALID_SOCKET;		//Ì×½Ó×ÖÎÞÐ§
-	DeleteCriticalSection(&m_cs);	//ÊÍ·ÅÁÙ½çÇø¶ÔÏó
-	CloseHandle(m_hEvent);			//ÊÍ·ÅÊÂ¼þ¶ÔÏó
+	closesocket(m_socket);			//å…³é—­å¥—æŽ¥å­—
+	m_socket = INVALID_SOCKET;		//å¥—æŽ¥å­—æ— æ•ˆ
+	DeleteCriticalSection(&m_cs);	//é‡Šæ”¾ä¸´ç•ŒåŒºå¯¹è±¡
+	CloseHandle(m_hEvent);			//é‡Šæ”¾äº‹ä»¶å¯¹è±¡
 }
 
-//´´½¨·¢ËÍºÍ½ÓÊÕÏß³Ì
+//åˆ›å»ºå‘é€å’ŒæŽ¥æ”¶çº¿ç¨‹
 BOOL CClient::StartRuning(void)
 {
-	m_bConning = TRUE;//ÉèÖÃÁ¬½Ó×´Ì¬
+	m_bConning = TRUE;//è®¾ç½®è¿žæŽ¥çŠ¶æ€
 
-	//´´½¨½ÓÊÕÊý¾ÝÏß³Ì
+	//åˆ›å»ºæŽ¥æ”¶æ•°æ®çº¿ç¨‹
 	unsigned long ulThreadId;
 	m_hThreadRecv = CreateThread(NULL, 0, RecvDataThread, this, 0, &ulThreadId);
 	if (NULL == m_hThreadRecv)
@@ -46,7 +46,7 @@ BOOL CClient::StartRuning(void)
 		CloseHandle(m_hThreadRecv);
 	}
 
-	//´´½¨½ÓÊÕ¿Í»§¶ËÊý¾ÝµÄÏß³Ì
+	//åˆ›å»ºæŽ¥æ”¶å®¢æˆ·ç«¯æ•°æ®çš„çº¿ç¨‹
 	m_hThreadSend = CreateThread(NULL, 0, SendDataThread, this, 0, &ulThreadId);
 	if (NULL == m_hThreadSend)
 	{
@@ -61,103 +61,113 @@ BOOL CClient::StartRuning(void)
 }
 
 
-//½ÓÊÕÊý¾Ý
+//æŽ¥æ”¶æ•°æ®
 DWORD CClient::RecvDataThread(void* pParam)
 {
-	CClient *pClient = (CClient*)pParam;	//¿Í»§¶Ë¶ÔÏóÖ¸Õë
-	int		reVal;							//·µ»ØÖµ
-	char	temp[MAX_NUM_BUF];				//ÁÙÊ±±äÁ¿
+	CClient *pClient = (CClient*)pParam;	//å®¢æˆ·ç«¯å¯¹è±¡æŒ‡é’ˆ
+	int		reVal;							//è¿”å›žå€¼
+	char	temp[MAX_NUM_BUF];				//ä¸´æ—¶å˜é‡
 
 
-	while (pClient->m_bConning)				//Á¬½Ó×´Ì¬
+	while (pClient->m_bConning)				//è¿žæŽ¥çŠ¶æ€
 	{
 		memset(temp, 0, MAX_NUM_BUF);
-		reVal = recv(pClient->m_socket, temp, MAX_NUM_BUF, 0);	//½ÓÊÕÊý¾Ý
+		reVal = recv(pClient->m_socket, temp, MAX_NUM_BUF, 0);	//æŽ¥æ”¶æ•°æ®
 
-		//´¦Àí´íÎó·µ»ØÖµ
+		//å¤„ç†é”™è¯¯è¿”å›žå€¼
 		if (SOCKET_ERROR == reVal)
 		{
 			int nErrCode = WSAGetLastError();
 
-			if (WSAEWOULDBLOCK == nErrCode)	//½ÓÊÜÊý¾Ý»º³åÇø²»¿ÉÓÃ
+			if (WSAEWOULDBLOCK == nErrCode)	//æŽ¥å—æ•°æ®ç¼“å†²åŒºä¸å¯ç”¨
 			{
-				continue;						//¼ÌÐøÑ­»·
+				continue;						//ç»§ç»­å¾ªçŽ¯
 			}
-			else if (WSAENETDOWN == nErrCode ||//¿Í»§¶Ë¹Ø±ÕÁËÁ¬½Ó
+			else if (WSAENETDOWN == nErrCode ||//å®¢æˆ·ç«¯å…³é—­äº†è¿žæŽ¥
 				WSAETIMEDOUT == nErrCode ||
 				WSAECONNRESET == nErrCode)
 			{
-				break;							//Ïß³ÌÍË³ö
+				break;							//çº¿ç¨‹é€€å‡º
 			}
 		}
 
-		//¿Í»§¶Ë¹Ø±ÕÁËÁ¬½Ó
+		//å®¢æˆ·ç«¯å…³é—­äº†è¿žæŽ¥
 		if (reVal == 0)
 		{
 			break;
 		}
 
-		//ÊÕµ½Êý¾Ý
+		//æ”¶åˆ°æ•°æ®
 		if (reVal > 0)
 		{
 			EnterCriticalSection(&pClient->m_cs);
 			char *pClientIP = inet_ntoa(pClient->m_addr.sin_addr);
 			u_short  clientPort = ntohs(pClient->m_addr.sin_port);
-			cout << "IP: " << pClientIP << "\tPort: " << clientPort << "\tData:" << temp << endl;      //Êä³öÏÔÊ¾Êý¾Ý
+			cout << "IP: " << pClientIP << "\tPort: " << clientPort << "\tData:" << temp << endl;      //è¾“å‡ºæ˜¾ç¤ºæ•°æ®
+			if (!strncmp(PING, temp, strlen(PING)))
+			{
+				strcpy(dataBuf, PING);
+				//åŠ ä¸ŠODOAå›žè½¦æ¢è¡Œ
+				dataBuf[strlen(PING)] = '\r';
+				dataBuf[strlen(PING)+1] = '\n';
+				dataBuf[strlen(PING)+2] = 0;
+				pClient->IsSend();
+			}
+				
 			LeaveCriticalSection(&pClient->m_cs);
 
-			memset(temp, 0, MAX_NUM_BUF);	//Çå¿ÕÁÙÊ±±äÁ¿
+			memset(temp, 0, MAX_NUM_BUF);	//æ¸…ç©ºä¸´æ—¶å˜é‡
 		}
 	}
 
-	pClient->m_bConning = FALSE;			//Óë¿Í»§¶ËµÄÁ¬½Ó¶Ï¿ª
-	return 0;								//Ïß³ÌÍË³ö
+	pClient->m_bConning = FALSE;			//ä¸Žå®¢æˆ·ç«¯çš„è¿žæŽ¥æ–­å¼€
+	return 0;								//çº¿ç¨‹é€€å‡º
 }
 
-//·¢ËÍÊý¾Ý
+//å‘é€æ•°æ®
 DWORD CClient::SendDataThread(void* pParam)
 {
-	CClient *pClient = (CClient*)pParam;//×ª»»Êý¾ÝÀàÐÍÎªCClientÖ¸Õë
-	while (pClient->m_bConning)//Á¬½Ó×´Ì¬
+	CClient *pClient = (CClient*)pParam;//è½¬æ¢æ•°æ®ç±»åž‹ä¸ºCClientæŒ‡é’ˆ
+	while (pClient->m_bConning)//è¿žæŽ¥çŠ¶æ€
 	{
 		if (pClient->m_bSend || bSend)
 		{
-			//½øÈëÁÙ½çÇø
+			//è¿›å…¥ä¸´ç•ŒåŒº
 			EnterCriticalSection(&pClient->m_cs);
-			//·¢ËÍÊý¾Ý
+			//å‘é€æ•°æ®
 			int val = send(pClient->m_socket, dataBuf, strlen(dataBuf), 0);
-			//´¦Àí·µ»Ø´íÎó
+			//å¤„ç†è¿”å›žé”™è¯¯
 			if (SOCKET_ERROR == val)
 			{
 				int nErrCode = WSAGetLastError();
-				if (nErrCode == WSAEWOULDBLOCK)//·¢ËÍÊý¾Ý»º³åÇø²»¿ÉÓÃ
+				if (nErrCode == WSAEWOULDBLOCK)//å‘é€æ•°æ®ç¼“å†²åŒºä¸å¯ç”¨
 				{
 					continue;
 				}
 				else if (WSAENETDOWN == nErrCode ||
 					WSAETIMEDOUT == nErrCode ||
-					WSAECONNRESET == nErrCode)//¿Í»§¶Ë¹Ø±ÕÁËÁ¬½Ó
+					WSAECONNRESET == nErrCode)//å®¢æˆ·ç«¯å…³é—­äº†è¿žæŽ¥
 				{
-					//Àë¿ªÁÙ½çÇø
+					//ç¦»å¼€ä¸´ç•ŒåŒº
 					LeaveCriticalSection(&pClient->m_cs);
 
-					pClient->m_bConning = FALSE;	//Á¬½Ó¶Ï¿ª
+					pClient->m_bConning = FALSE;	//è¿žæŽ¥æ–­å¼€
 					pClient->m_bSend = FALSE;
 					break;
 				}
 				else {
-					//Àë¿ªÁÙ½çÇø
+					//ç¦»å¼€ä¸´ç•ŒåŒº
 					LeaveCriticalSection(&pClient->m_cs);
-					pClient->m_bConning = FALSE;	//Á¬½Ó¶Ï¿ª
+					pClient->m_bConning = FALSE;	//è¿žæŽ¥æ–­å¼€
 					pClient->m_bSend = FALSE;
 					break;
 				}
 			}
-			//³É¹¦·¢ËÍÊý¾Ý
-			//Àë¿ªÁÙ½çÇø
-			memset(dataBuf, 0, MAX_NUM_BUF);		//Çå¿Õ½ÓÊÕ»º³åÇø
+			//æˆåŠŸå‘é€æ•°æ®
+			//ç¦»å¼€ä¸´ç•ŒåŒº
+			memset(dataBuf, 0, MAX_NUM_BUF);		//æ¸…ç©ºæŽ¥æ”¶ç¼“å†²åŒº
 			LeaveCriticalSection(&pClient->m_cs);
-			//ÉèÖÃÊÂ¼þÎªÎÞÐÅºÅ×´Ì¬
+			//è®¾ç½®äº‹ä»¶ä¸ºæ— ä¿¡å·çŠ¶æ€
 			pClient->m_bSend = FALSE;
 			bSend = FALSE;
 		}

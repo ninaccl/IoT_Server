@@ -1,15 +1,15 @@
-#include "server.h"
+ï»¿#include "server.h"
 
 int main(int argc, char* argv[])
 {
-	//³õÊ¼»¯·şÎñÆ÷
+	//åˆå§‹åŒ–æœåŠ¡å™¨
 	if (!initServer())
 	{
 		exitServer();
 		return SERVER_SETUP_FAIL;
 	}
 
-	//Æô¶¯·şÎñ
+	//å¯åŠ¨æœåŠ¡
 	if (!startService())
 	{
 		showServerStartMsg(FALSE);
@@ -17,10 +17,10 @@ int main(int argc, char* argv[])
 		return SERVER_SETUP_FAIL;
 	}
 
-	//´¦ÀíÊı¾İ
+	//å¤„ç†æ•°æ®
 	inputAndOutput();
 
-	//ÍË³öÖ÷Ïß³Ì£¬ÇåÀí×ÊÔ´
+	//é€€å‡ºä¸»çº¿ç¨‹ï¼Œæ¸…ç†èµ„æº
 	exitServer();
 
 	return 0;
