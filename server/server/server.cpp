@@ -204,7 +204,7 @@ DWORD __stdcall cleanThread(void* pParam)
 					//显示断联客户端的ip和端口
 					char *pClientIP = inet_ntoa(pClient->GetAddr().sin_addr);
 					u_short clientPort = ntohs(pClient->GetAddr().sin_port);
-					cout << "Leave a client IP: " << pClientIP << "\t\tPort: " << clientPort << endl;
+					cout << "Leave a client IP: " << pClientIP << "\tPort: " << clientPort << endl;
 
 					iter = clientvector.erase(iter);	//删除节点
 					delete pClient;
